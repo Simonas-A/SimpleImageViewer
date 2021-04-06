@@ -785,6 +785,14 @@ namespace SimpleImageViewer
             {
                 WindowState = FormWindowState.Minimized;
             }
+            else if (X >= resolution.Width - reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle right
+            {
+                ImageNext();
+            }
+            else if (X <= reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle left
+            {
+                ImagePrevious();
+            }
         }
     }
 }
