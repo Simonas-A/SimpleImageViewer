@@ -143,6 +143,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="img_260685.ico" />
+    <None Include="Resources\minimize1.png" />
+    <None Include="Resources\monitor.png" />
+    <None Include="Resources\minimize.png" />
+    <None Include="Resources\right.png" />
+    <None Include="Resources\left.png" />
+    <None Include="Resources\close.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

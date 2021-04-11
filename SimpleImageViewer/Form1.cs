@@ -40,8 +40,13 @@ namespace SimpleImageViewer
 
         Rectangle resolution;
 
+        bool WideImage;
+        bool zoomedToFit;
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            pictureBox1.Controls.Add(pictureBox2);
+            //pictureBox2.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             //MessageBox.Show("Rel");
             monitor = SimpleImageViewer.Properties.Settings.Default.Monitor;
 
@@ -65,6 +70,7 @@ namespace SimpleImageViewer
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\DSC_3432.jpg" }; //landscape
             //args = new string[] { "", "G:\\PicturesBackup 2020-12-16\\Camera\\20171014_121602.jpg" }; //port
             //args = new string[] { "", "G:\\PicturesBackup 2020-12-16\\Camera\\20171014_123121.jpg" }; // land
+            //args = new string[] { "", "E:\\memes\\168937473_4522624104419534_2925807893586856406_n.jpg" }; // meme 276x370
 
             /*
             
@@ -150,6 +156,8 @@ namespace SimpleImageViewer
                 if (img.Width < resolution.Width && img.Height < resolution.Height)
                 {
                     pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;
+
+                    
                 }
                 else
                 {
@@ -168,13 +176,154 @@ namespace SimpleImageViewer
                 //SetImage(img);
                 //Thread thread = new Thread(SetImage(img));
                 //thread.Start();
+
+                if ((double)pictureBox1.Image.Width / resolution.Width > (double)pictureBox1.Image.Height / resolution.Height)
+                {
+                    WideImage = false;
+                }
+                else
+                {
+                    WideImage = true;
+                }
+                zoomedToFit = false;
+
                 files = Directory.GetFiles(root, "*.*").Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
             }
             //MessageBox.Show(sender.ToString());
         }
 
+        private Rectangle GetDisplayedRectangle(Image img, Rectangle resolution)
+        {
+            int x;
+            int y;
+            int width;
+            int height;
+
+            if (img.Width < resolution.Width && img.Height < resolution.Height)
+            {
+                x = Convert.ToInt32(pictureBox1.Width * 0.5 - pictureBox1.Image.Width * 0.5);
+                y = Convert.ToInt32(pictureBox1.Height * 0.5 - pictureBox1.Image.Height * 0.5);
+                width = img.Width;
+                height = img.Height;
+            }
+            else
+            {
+                if (img.Width/resolution.Width > img.Height/resolution.Height)
+                {
+                    double ratio = (double)img.Width / resolution.Width;
+                    x = 0;
+                    y = Convert.ToInt32((resolution.Height - (img.Height / ratio)) * 0.5);
+                    width = resolution.Width;
+                    height = Convert.ToInt32(img.Height / ratio);
+                }
+                else
+                {
+                    double ratio = (double)img.Height / resolution.Height;
+                    x = Convert.ToInt32((resolution.Width - (img.Width / ratio)) * 0.5);
+                    y = 0;
+                    width = Convert.ToInt32(img.Width / ratio);
+                    height = resolution.Height;
+                }
+            }
+            return new Rectangle(x, y, width, height);
+        }
+
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
+            //label1.Text = e.X + ";" + e.Y;
+            //label1.Text = pictureBox1.DisplayRectangle.X.ToString();
+
+            scale += e.Delta / Math.Abs(e.Delta);
+            label1.Text = scale.ToString();
+
+            Rectangle displayRectangle = GetDisplayedRectangle(pictureBox1.Image, resolution);
+
+            label1.Text = displayRectangle.ToString();
+            //MessageBox.Show("OPA");
+
+            double ratio = (double)pictureBox1.Image.Width / pictureBox1.Image.Height;
+
+            int baseSizeX = Convert.ToInt32(pictureBox1.Image.Width * 0.05);
+            int baseSizeY = Convert.ToInt32(baseSizeX / ratio);
+
+            int x, y, width, height;
+
+            if ( (displayRectangle.Width < resolution.Width || displayRectangle.Height < resolution.Height) && !zoomedToFit)
+            {
+                if (!(displayRectangle.Width < resolution.Width && displayRectangle.Height < resolution.Height))
+                {
+                    if (!WideImage)
+                    {
+                        x = Convert.ToInt32(baseSizeX * (e.X / (pictureBox1.Width * 0.5)));
+                        width = pictureBox1.Image.Width - 2 * baseSizeX;
+                        y = 0;
+                        height = pictureBox1.Image.Height;
+
+                        if ((double)height / resolution.Height > (double)width / resolution.Width)
+                        {
+                            width = (height * resolution.Width / resolution.Height);
+                            x = (pictureBox1.Image.Width - width) / 2;
+                            zoomedToFit = true;
+                        }
+                    }
+                    else
+                    {
+                        x = 0;
+                        width = pictureBox1.Image.Width;
+                        y = Convert.ToInt32(baseSizeY * (e.Y / (pictureBox1.Height * 0.5)));
+                        height = pictureBox1.Image.Height - 2 * baseSizeY;
+
+                        if ((double)width / resolution.Width > (double)height / resolution.Height)
+                        {
+                            height = (width * resolution.Height / resolution.Width);
+                            y = (pictureBox1.Image.Height - height) / 2;
+                            zoomedToFit = true;
+                        }
+                    }
+                }
+                else
+                {
+                    x = 0;
+                    y = 0;
+                    width = pictureBox1.Image.Width;
+                    height = pictureBox1.Image.Height;
+                    //zoomedToFit = true;
+                }
+            }
+            else
+            {
+                x = Convert.ToInt32(baseSizeX * (e.X / (pictureBox1.Width * 0.5)));
+                width = pictureBox1.Image.Width - 2 * baseSizeX;
+                y = Convert.ToInt32(baseSizeY * (e.Y / (pictureBox1.Height * 0.5)));
+                height = pictureBox1.Image.Height - 2 * baseSizeY;
+            }
+
+            label1.Text += '\n'.ToString() + new Rectangle(x, y, width, height).ToString();
+            Bitmap bmp = ((Bitmap)pictureBox1.Image).Clone(new Rectangle(x, y, width, height), PixelFormat.Format24bppRgb);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.Image = bmp;
+
+            /*
+            if (e.Delta >= 0)
+            {
+                pictureBox1.Left -= 100;
+                pictureBox1.Width += 200;
+
+                pictureBox1.Top -= 100;
+                pictureBox1.Height += 200;
+            }
+            else
+            {
+                pictureBox1.Left += 100;
+                pictureBox1.Width -= 200;
+
+                pictureBox1.Top += 100;
+                pictureBox1.Height -= 200;
+            }
+            */
+
+            //label1.Text = pictureBox1.Left.ToString() + '\n' + pictureBox1.Width;
+
             /*
             double zoomFactor = 0.1;
             Size newSize = new Size((int)(pictureBox1.Image.Width * zoomFactor), (int)(pictureBox1.Image.Height * zoomFactor));
@@ -704,6 +853,63 @@ namespace SimpleImageViewer
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            int X = e.X;
+            int Y = e.Y;
+
+            int reactionSize = 150;
+
+            pictureBox2.Width = 100;
+            pictureBox2.Height = 100;
+
+            pictureBox2.Visible = true;
+            if (X >= resolution.Width - reactionSize && Y <= reactionSize) //top right
+            {
+                /*
+                pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
+
+                using (Graphics g = Graphics.FromImage(pictureBox2.Image))
+                {
+                    g.DrawImage(Properties.Resources.close, 0, 0, 150, 150);
+                }
+                */
+                
+                pictureBox2.Image = Properties.Resources.close;
+                pictureBox2.Left = resolution.Width - pictureBox2.Width;
+                pictureBox2.Top = 0;
+            }
+            else if (X >= resolution.Width - reactionSize && Y >= resolution.Height - reactionSize) //bottom right
+            {
+                pictureBox2.Visible = false;
+            }
+            else if (X <= reactionSize && Y >= resolution.Height - reactionSize) // bottom left
+            {
+                pictureBox2.Image = Properties.Resources.monitor;
+                pictureBox2.Left = 0;
+                pictureBox2.Top = resolution.Height - pictureBox2.Width;
+            }
+            else if (X <= reactionSize && Y <= reactionSize) // top left
+            {
+                pictureBox2.Image = Properties.Resources.minimize;
+                pictureBox2.Left = 0;
+                pictureBox2.Top = 0;
+            }
+            else if (X >= resolution.Width - reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle right
+            {
+                pictureBox2.Image = Properties.Resources.right;
+                pictureBox2.Left = resolution.Width - pictureBox2.Width;
+                pictureBox2.Top = resolution.Height / 2 - pictureBox2.Height / 2;
+            }
+            else if (X <= reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle left
+            {
+                pictureBox2.Image = Properties.Resources.left;
+                pictureBox2.Left = 0;
+                pictureBox2.Top = resolution.Height / 2 - pictureBox2.Height / 2;
+            }
+            else
+            {
+                pictureBox2.Visible = false;
+            }
+
             //label1.Text = e.X + Environment.NewLine + e.Y;
             /*
             //MessageBox.Show("DWH");
@@ -755,6 +961,50 @@ namespace SimpleImageViewer
         {
             int X = e.X;
             int Y = e.Y;
+
+            int reactionSize = 150;
+
+            if (X >= resolution.Width - reactionSize && Y <= reactionSize) //top right
+            {
+                Close();
+            }
+            else if (X >= resolution.Width - reactionSize && Y >= resolution.Height - reactionSize) //bottom right
+            {
+
+            }
+            else if (X <= reactionSize && Y >= resolution.Height - reactionSize) // bottom left
+            {
+                monitor = ((monitor + 1) % Screen.AllScreens.Length);
+                SimpleImageViewer.Properties.Settings.Default.Monitor = monitor;
+                Properties.Settings.Default.Save();
+                resolution = Screen.AllScreens[monitor].Bounds;
+
+                Image baseImage = Image.FromFile(path);
+                //Task.Factory.StartNew(() => SetImage(img));
+                SetImage(baseImage);
+
+                this.Size = new Size(resolution.Width, resolution.Height);
+                pictureBox1.Size = new Size(resolution.Width, resolution.Height);
+                this.Location = new Point(resolution.X, resolution.Y);
+            }
+            else if (X <= reactionSize && Y <= reactionSize) // top left
+            {
+                WindowState = FormWindowState.Minimized;
+            }
+            else if (X >= resolution.Width - reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle right
+            {
+                ImageNext();
+            }
+            else if (X <= reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle left
+            {
+                ImagePrevious();
+            }
+        }
+
+        private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
+        {
+            int X = e.X + pictureBox2.Location.X;
+            int Y = e.Y + pictureBox2.Location.Y;
 
             int reactionSize = 150;
 
