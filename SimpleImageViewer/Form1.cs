@@ -40,6 +40,8 @@ namespace SimpleImageViewer
 
         Rectangle resolution;
 
+        Rectangle oldDisplayedRectangle;
+
         bool WideImage;
         bool zoomedToFit;
 
@@ -68,8 +70,6 @@ namespace SimpleImageViewer
             //string[] args = new string[] { "", "E:\\Joniniu Foto 2020\\DSC_3314.jpg" };
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\DSC_3314.jpg" }; //portrait
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\DSC_3432.jpg" }; //landscape
-            //args = new string[] { "", "G:\\PicturesBackup 2020-12-16\\Camera\\20171014_121602.jpg" }; //port
-            //args = new string[] { "", "G:\\PicturesBackup 2020-12-16\\Camera\\20171014_123121.jpg" }; // land
             //args = new string[] { "", "E:\\memes\\168937473_4522624104419534_2925807893586856406_n.jpg" }; // meme 276x370
 
             /*
@@ -177,6 +177,7 @@ namespace SimpleImageViewer
                 //Thread thread = new Thread(SetImage(img));
                 //thread.Start();
 
+                /*
                 if ((double)pictureBox1.Image.Width / resolution.Width > (double)pictureBox1.Image.Height / resolution.Height)
                 {
                     WideImage = false;
@@ -186,7 +187,12 @@ namespace SimpleImageViewer
                     WideImage = true;
                 }
                 zoomedToFit = false;
+                */
 
+
+                //oldDisplayedRectangle = new Rectangle(resolution.Location, resolution.Size);
+                //oldDisplayedRectangle = GetDisplayedRectangle(baseImage, resolution);
+                oldDisplayedRectangle = new Rectangle(0, 0, img.Width, img.Height);
                 files = Directory.GetFiles(root, "*.*").Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
             }
             //MessageBox.Show(sender.ToString());
@@ -194,12 +200,13 @@ namespace SimpleImageViewer
 
         private Rectangle GetDisplayedRectangle(Image img, Rectangle resolution)
         {
+            img = pictureBox1.Image;
             int x;
             int y;
             int width;
             int height;
 
-            if (img.Width < resolution.Width && img.Height < resolution.Height)
+            if ( (img.Width < resolution.Width && img.Height < resolution.Height) && !(pictureBox1.SizeMode == PictureBoxSizeMode.Zoom))
             {
                 x = Convert.ToInt32(pictureBox1.Width * 0.5 - pictureBox1.Image.Width * 0.5);
                 y = Convert.ToInt32(pictureBox1.Height * 0.5 - pictureBox1.Image.Height * 0.5);
@@ -233,220 +240,341 @@ namespace SimpleImageViewer
             //label1.Text = e.X + ";" + e.Y;
             //label1.Text = pictureBox1.DisplayRectangle.X.ToString();
 
+            //Close();
+
+            double zoomFactor = 0.85;
+
+            DateTime dt0 = DateTime.Now;
+
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             scale += e.Delta / Math.Abs(e.Delta);
-            label1.Text = scale.ToString();
+            label1.Text = "Scale: " + scale.ToString();
+
+            if (scale < 0)
+            {
+                scale = 0;
+                return;
+            }
 
             Rectangle displayRectangle = GetDisplayedRectangle(pictureBox1.Image, resolution);
+            label1.Text += '\n'.ToString() + displayRectangle.ToString();
 
-            label1.Text = displayRectangle.ToString();
-            //MessageBox.Show("OPA");
 
-            double ratio = (double)pictureBox1.Image.Width / pictureBox1.Image.Height;
+            double imageRatio = (double)baseImage.Width / baseImage.Height;
+            double displayRatio = (double)resolution.Width / resolution.Height;
 
-            int baseSizeX = Convert.ToInt32(pictureBox1.Image.Width * 0.05);
-            int baseSizeY = Convert.ToInt32(baseSizeX / ratio);
+            int width, height;
 
-            int x, y, width, height;
+            if (baseImage.Width / resolution.Width > baseImage.Height / resolution.Height)
+            {//Wide picture
 
-            if ( (displayRectangle.Width < resolution.Width || displayRectangle.Height < resolution.Height) && !zoomedToFit)
+                width = Convert.ToInt32(baseImage.Width * Math.Pow(zoomFactor, scale));
+                height = Convert.ToInt32(width / displayRatio);
+            }
+            else
+            {//Tall picture
+
+                height = Convert.ToInt32(baseImage.Height * Math.Pow(zoomFactor, scale));
+                width = Convert.ToInt32(height * displayRatio);
+            }
+
+            label1.Text += '\n'.ToString() + "Width: " + width.ToString() + "; Height: " + height.ToString();
+
+            //double widthFactor = (oldDisplayedRectangle.X + e.X * (double)oldDisplayedRectangle.Width / resolution.Width) / baseImage.Width;
+            //double heightFactor = (oldDisplayedRectangle.Y + e.Y * (double)oldDisplayedRectangle.Height / resolution.Height) / baseImage.Height;
+
+            //int Xloc = Convert.ToInt32(oldDisplayedRectangle.X + ((double)(e.X - displayRectangle.X) / displayRectangle.Width) * oldDisplayedRectangle.Width);
+            //int Yloc = Convert.ToInt32(oldDisplayedRectangle.Y + ((double)(e.Y - displayRectangle.Y) / displayRectangle.Height) * oldDisplayedRectangle.Height);
+
+            int x = oldDisplayedRectangle.X + ((oldDisplayedRectangle.Width - width) ) * e.X / (resolution.Width - displayRectangle.X);
+            int y = oldDisplayedRectangle.Y + ((oldDisplayedRectangle.Height - height) ) * e.Y / (resolution.Height - displayRectangle.Y);
+
+            /*
+            int x = oldDisplayedRectangle.X + (Convert.ToInt32((oldDisplayedRectangle.Width - width) / 2) * e.X / resolution.X);
+            int y = oldDisplayedRectangle.Y + (Convert.ToInt32((oldDisplayedRectangle.Height - height) / 2) * e.Y / resolution.Y);
+
+            if (oldDisplayedRectangle.X == 0 || oldDisplayedRectangle.Y == 0 || oldDisplayedRectangle.Width == baseImage.Width || oldDisplayedRectangle.Height == baseImage.Height)
             {
-                if (!(displayRectangle.Width < resolution.Width && displayRectangle.Height < resolution.Height))
-                {
-                    if (!WideImage)
-                    {
-                        x = Convert.ToInt32(baseSizeX * (e.X / (pictureBox1.Width * 0.5)));
-                        width = pictureBox1.Image.Width - 2 * baseSizeX;
-                        y = 0;
-                        height = pictureBox1.Image.Height;
+                x = (Convert.ToInt32((oldDisplayedRectangle.Width - width) / 2) * e.X / resolution.X);
+                y = (Convert.ToInt32((oldDisplayedRectangle.Height - height) / 2) * e.Y / resolution.Y);
+            }
 
-                        if ((double)height / resolution.Height > (double)width / resolution.Width)
+            if (oldDisplayedRectangle.Width < width)
+            {
+
+            }
+
+            if (oldDisplayedRectangle.Height < height)
+            {
+
+            }
+            */
+
+            //label1.Text += '\n'.ToString() + "W: " + widthFactor.ToString() + '\n' + "H: " + heightFactor.ToString();
+
+            
+            if (x < 0 || x + width > baseImage.Width)
+            {
+                x = 0;
+                width = baseImage.Width;
+            }
+
+            if (y < 0 || y + height > baseImage.Height)
+            {
+                y = 0;
+                height = baseImage.Height;
+            }
+            
+            /*
+            if ((double)width / height - (double)16 / 9 > 0.1)
+            {
+                MessageBox.Show("OPCE");
+            }
+            */
+
+            
+            oldDisplayedRectangle = new Rectangle(x, y, width, height);
+
+            label1.Text += "\n newDims: " + oldDisplayedRectangle.ToString();
+
+            DateTime dt1 = DateTime.Now;
+
+            //pictureBox1.Image = new Bitmap(resolution.Width, resolution.Height);
+            Bitmap bmp = new Bitmap(oldDisplayedRectangle.Width, oldDisplayedRectangle.Height);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                //g.Clear(Color.FromArgb(33, 33, 33));
+                g.DrawImage(baseImage, new Rectangle(0,0,oldDisplayedRectangle.Width, oldDisplayedRectangle.Height), oldDisplayedRectangle, GraphicsUnit.Pixel);
+            }
+
+            pictureBox1.Image = bmp;
+
+            //Bitmap bmp = ((Bitmap)baseImage).Clone(oldDisplayedRectangle, PixelFormat.Format24bppRgb);
+
+            DateTime dt2 = DateTime.Now;
+
+            //pictureBox1.Image.Dispose();
+            //pictureBox1.Image = bmp;
+
+            DateTime dt3 = DateTime.Now;
+
+            label1.Text = "Calculations: " + (dt1 - dt0).TotalMilliseconds.ToString() + "\nCloning: " + (dt2 - dt1).TotalMilliseconds.ToString() + "\nDisplaying: " + (dt3 - dt2).TotalMilliseconds.ToString();
+
+
+
+            {
+                /*
+                int baseSizeX = Convert.ToInt32(pictureBox1.Image.Width * 0.05);
+                int baseSizeY = Convert.ToInt32(baseSizeX / ratio);
+                */
+
+                /*
+                int x, y, width, height;
+
+                if ((displayRectangle.Width < resolution.Width || displayRectangle.Height < resolution.Height) && !zoomedToFit)
+                {
+                    if (!(displayRectangle.Width < resolution.Width && displayRectangle.Height < resolution.Height))
+                    {
+                        if (!WideImage)
                         {
-                            width = (height * resolution.Width / resolution.Height);
-                            x = (pictureBox1.Image.Width - width) / 2;
-                            zoomedToFit = true;
+                            x = Convert.ToInt32(baseSizeX * (e.X / (pictureBox1.Width * 0.5)));
+                            width = pictureBox1.Image.Width - 2 * baseSizeX;
+                            y = 0;
+                            height = pictureBox1.Image.Height;
+
+                            if ((double)height / resolution.Height > (double)width / resolution.Width)
+                            {
+                                width = (height * resolution.Width / resolution.Height);
+                                x = (pictureBox1.Image.Width - width) / 2;
+                                zoomedToFit = true;
+                            }
+                        }
+                        else
+                        {
+                            x = 0;
+                            width = pictureBox1.Image.Width;
+                            y = Convert.ToInt32(baseSizeY * (e.Y / (pictureBox1.Height * 0.5)));
+                            height = pictureBox1.Image.Height - 2 * baseSizeY;
+
+                            if ((double)width / resolution.Width > (double)height / resolution.Height)
+                            {
+                                height = (width * resolution.Height / resolution.Width);
+                                y = (pictureBox1.Image.Height - height) / 2;
+                                zoomedToFit = true;
+                            }
                         }
                     }
                     else
                     {
                         x = 0;
+                        y = 0;
                         width = pictureBox1.Image.Width;
-                        y = Convert.ToInt32(baseSizeY * (e.Y / (pictureBox1.Height * 0.5)));
-                        height = pictureBox1.Image.Height - 2 * baseSizeY;
-
-                        if ((double)width / resolution.Width > (double)height / resolution.Height)
-                        {
-                            height = (width * resolution.Height / resolution.Width);
-                            y = (pictureBox1.Image.Height - height) / 2;
-                            zoomedToFit = true;
-                        }
+                        height = pictureBox1.Image.Height;
+                        //zoomedToFit = true;
                     }
                 }
                 else
                 {
-                    x = 0;
-                    y = 0;
-                    width = pictureBox1.Image.Width;
-                    height = pictureBox1.Image.Height;
-                    //zoomedToFit = true;
+                    x = Convert.ToInt32(baseSizeX * (e.X / (pictureBox1.Width * 0.5)));
+                    width = pictureBox1.Image.Width - 2 * baseSizeX;
+                    y = Convert.ToInt32(baseSizeY * (e.Y / (pictureBox1.Height * 0.5)));
+                    height = pictureBox1.Image.Height - 2 * baseSizeY;
                 }
-            }
-            else
-            {
-                x = Convert.ToInt32(baseSizeX * (e.X / (pictureBox1.Width * 0.5)));
-                width = pictureBox1.Image.Width - 2 * baseSizeX;
-                y = Convert.ToInt32(baseSizeY * (e.Y / (pictureBox1.Height * 0.5)));
-                height = pictureBox1.Image.Height - 2 * baseSizeY;
-            }
 
-            label1.Text += '\n'.ToString() + new Rectangle(x, y, width, height).ToString();
-            Bitmap bmp = ((Bitmap)pictureBox1.Image).Clone(new Rectangle(x, y, width, height), PixelFormat.Format24bppRgb);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.Image = bmp;
+                label1.Text += '\n'.ToString() + new Rectangle(x, y, width, height).ToString();
+                Bitmap bmp = ((Bitmap)pictureBox1.Image).Clone(new Rectangle(x, y, width, height), PixelFormat.Format24bppRgb);
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                pictureBox1.Image = bmp;
 
-            /*
-            if (e.Delta >= 0)
-            {
-                pictureBox1.Left -= 100;
-                pictureBox1.Width += 200;
+                */
 
-                pictureBox1.Top -= 100;
-                pictureBox1.Height += 200;
-            }
-            else
-            {
-                pictureBox1.Left += 100;
-                pictureBox1.Width -= 200;
-
-                pictureBox1.Top += 100;
-                pictureBox1.Height -= 200;
-            }
-            */
-
-            //label1.Text = pictureBox1.Left.ToString() + '\n' + pictureBox1.Width;
-
-            /*
-            double zoomFactor = 0.1;
-            Size newSize = new Size((int)(pictureBox1.Image.Width * zoomFactor), (int)(pictureBox1.Image.Height * zoomFactor));
-            Bitmap bmp = new Bitmap(pictureBox1.Image, newSize);
-            pictureBox1.Image = bmp;
-
-            */
-
-
-
-            /*
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            if (e.Delta > 0 && scale < 48)
-            {
-                double factor = 0.5;
-                int incX = (int)(pictureBox1.Width * factor);
-                int incY = (int)(pictureBox1.Height * factor);
-
-                double right = (double)e.X / pictureBox1.Width;
-                double left = 1 - (double)e.X / pictureBox1.Width;
-
-                pictureBox1.Width += (int)(incX * right);
-                pictureBox1.Height += incY;
-                pictureBox1.Left -= (int)((incX / 2) * left);
-                pictureBox1.Top -= incY / 2;
-
-                scale++;
-            }
-            else if (e.Delta < 0 && scale > 0)
-            {
-                if (scale == 1)
+                /*
+                if (e.Delta >= 0)
                 {
-                    SetImage(baseImage);
+                    pictureBox1.Left -= 100;
+                    pictureBox1.Width += 200;
+
+                    pictureBox1.Top -= 100;
+                    pictureBox1.Height += 200;
                 }
                 else
                 {
-                    double factor = 0.25;
+                    pictureBox1.Left += 100;
+                    pictureBox1.Width -= 200;
+
+                    pictureBox1.Top += 100;
+                    pictureBox1.Height -= 200;
+                }
+                */
+
+                //label1.Text = pictureBox1.Left.ToString() + '\n' + pictureBox1.Width;
+
+                /*
+                double zoomFactor = 0.1;
+                Size newSize = new Size((int)(pictureBox1.Image.Width * zoomFactor), (int)(pictureBox1.Image.Height * zoomFactor));
+                Bitmap bmp = new Bitmap(pictureBox1.Image, newSize);
+                pictureBox1.Image = bmp;
+
+                */
+
+
+
+                /*
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                if (e.Delta > 0 && scale < 48)
+                {
+                    double factor = 0.5;
                     int incX = (int)(pictureBox1.Width * factor);
                     int incY = (int)(pictureBox1.Height * factor);
 
-                    pictureBox1.Left += incX / 2;
-                    pictureBox1.Top += incY / 2;
-                    pictureBox1.Width -= incX;
-                    pictureBox1.Height -= incY;
-                    
+                    double right = (double)e.X / pictureBox1.Width;
+                    double left = 1 - (double)e.X / pictureBox1.Width;
+
+                    pictureBox1.Width += (int)(incX * right);
+                    pictureBox1.Height += incY;
+                    pictureBox1.Left -= (int)((incX / 2) * left);
+                    pictureBox1.Top -= incY / 2;
+
+                    scale++;
                 }
-                scale--;
-            }
-
-
-            label1.Text = pictureBox1.Location.ToString() + Environment.NewLine + pictureBox1.Size + Environment.NewLine + scale;
-            */
-
-
-            //ResizeAndDisplayImage();
-            //UpdateZoomedImage(e);
-            /*
-            int sclOld = scale;
-            if (e.Delta > 0 && scale < 24)
-            {
-                scale++;
-            }
-            else if (e.Delta < 0 && scale > 0)
-            {
-                scale--;
-            }
-            
-
-            if (scale != 0)
-            {
-                if (sclOld != scale)
+                else if (e.Delta < 0 && scale > 0)
                 {
-                    DateTime dt = DateTime.Now;
-                    pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-                    //pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;
+                    if (scale == 1)
+                    {
+                        SetImage(baseImage);
+                    }
+                    else
+                    {
+                        double factor = 0.25;
+                        int incX = (int)(pictureBox1.Width * factor);
+                        int incY = (int)(pictureBox1.Height * factor);
 
-                    //Size newSize = new Size((int)(baseImage.Width * ((float)scale / 6)), (int)(baseImage.Height * ((float)scale / 6)));
-                    //Bitmap bmp = new Bitmap(baseImage, newSize);
+                        pictureBox1.Left += incX / 2;
+                        pictureBox1.Top += incY / 2;
+                        pictureBox1.Width -= incX;
+                        pictureBox1.Height -= incY;
 
-                    //pictureBox1.Image = bmp;
-
-
-
-                    int X = e.X;
-                    int Y = e.Y;
-                    Point size = new Point(pictureBox1.ClientSize.Width * (25 - scale) / 24, pictureBox1.ClientSize.Height * (25 - scale) / 24);
-
-                    Point startPoint = new Point(X - size.X / 2 < 0 ? 0 : X - size.X / 2, Y - size.Y / 2 < 0 ? 0 : Y - size.Y / 2);
-                    int width = X + size.X / 2 > pictureBox1.ClientSize.Width ? pictureBox1.ClientSize.Width - startPoint.X : X + size.X / 2 - startPoint.X;
-                    int height = Y + size.Y / 2 > pictureBox1.ClientSize.Height ? pictureBox1.ClientSize.Height - startPoint.Y : Y + size.Y / 2 - startPoint.Y;
-
-                    pictureBox1.Left = -startPoint.X;
-                    pictureBox1.Top = -startPoint.Y;
-
-                    pictureBox1.Width = pictureBox1.Width + 1 * startPoint.X;
-                    pictureBox1.Height = pictureBox1.Height + 1 * startPoint.Y;
-
-                    //scaledImage = (Image)(((Bitmap)baseImage).Clone(new Rectangle(startPoint, new Size(width, height)), System.Drawing.Imaging.PixelFormat.Format24bppRgb));
-                    scaledImage = baseImage;
-
-                    //pictureBox1.Image = scaledImage;
-                    DateTime dt1 = DateTime.Now;
-                    //MessageBox.Show((dt1 - dt).TotalMilliseconds.ToString());
-                    //MessageBox.Show(pictureBox1.Location.ToString() + Environment.NewLine + pictureBox1.Size);
-                    label1.Text = size.ToString() + Environment.NewLine + pictureBox1.Location.ToString() + Environment.NewLine + pictureBox1.Size + Environment.NewLine + scale;
-                    //label1.Text = "img: " + baseImage.Size.ToString() + Environment.NewLine + "pctr: " + pictureBox1.ClientSize.ToString();
+                    }
+                    scale--;
                 }
+
+
+                label1.Text = pictureBox1.Location.ToString() + Environment.NewLine + pictureBox1.Size + Environment.NewLine + scale;
+                */
+
+
+                //ResizeAndDisplayImage();
+                //UpdateZoomedImage(e);
+                /*
+                int sclOld = scale;
+                if (e.Delta > 0 && scale < 24)
+                {
+                    scale++;
+                }
+                else if (e.Delta < 0 && scale > 0)
+                {
+                    scale--;
+                }
+
+
+                if (scale != 0)
+                {
+                    if (sclOld != scale)
+                    {
+                        DateTime dt = DateTime.Now;
+                        pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                        //pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;
+
+                        //Size newSize = new Size((int)(baseImage.Width * ((float)scale / 6)), (int)(baseImage.Height * ((float)scale / 6)));
+                        //Bitmap bmp = new Bitmap(baseImage, newSize);
+
+                        //pictureBox1.Image = bmp;
+
+
+
+                        int X = e.X;
+                        int Y = e.Y;
+                        Point size = new Point(pictureBox1.ClientSize.Width * (25 - scale) / 24, pictureBox1.ClientSize.Height * (25 - scale) / 24);
+
+                        Point startPoint = new Point(X - size.X / 2 < 0 ? 0 : X - size.X / 2, Y - size.Y / 2 < 0 ? 0 : Y - size.Y / 2);
+                        int width = X + size.X / 2 > pictureBox1.ClientSize.Width ? pictureBox1.ClientSize.Width - startPoint.X : X + size.X / 2 - startPoint.X;
+                        int height = Y + size.Y / 2 > pictureBox1.ClientSize.Height ? pictureBox1.ClientSize.Height - startPoint.Y : Y + size.Y / 2 - startPoint.Y;
+
+                        pictureBox1.Left = -startPoint.X;
+                        pictureBox1.Top = -startPoint.Y;
+
+                        pictureBox1.Width = pictureBox1.Width + 1 * startPoint.X;
+                        pictureBox1.Height = pictureBox1.Height + 1 * startPoint.Y;
+
+                        //scaledImage = (Image)(((Bitmap)baseImage).Clone(new Rectangle(startPoint, new Size(width, height)), System.Drawing.Imaging.PixelFormat.Format24bppRgb));
+                        scaledImage = baseImage;
+
+                        //pictureBox1.Image = scaledImage;
+                        DateTime dt1 = DateTime.Now;
+                        //MessageBox.Show((dt1 - dt).TotalMilliseconds.ToString());
+                        //MessageBox.Show(pictureBox1.Location.ToString() + Environment.NewLine + pictureBox1.Size);
+                        label1.Text = size.ToString() + Environment.NewLine + pictureBox1.Location.ToString() + Environment.NewLine + pictureBox1.Size + Environment.NewLine + scale;
+                        //label1.Text = "img: " + baseImage.Size.ToString() + Environment.NewLine + "pctr: " + pictureBox1.ClientSize.ToString();
+                    }
+                }
+                else
+                {
+                    pictureBox1.Left = 0;
+                    pictureBox1.Top = 0;
+                    pictureBox1.Size = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+                    SetFullImage(baseImage, Screen.PrimaryScreen.Bounds);
+                }
+
+
+
+                */
             }
-            else
-            {
-                pictureBox1.Left = 0;
-                pictureBox1.Top = 0;
-                pictureBox1.Size = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-                SetFullImage(baseImage, Screen.PrimaryScreen.Bounds);
-            }
-
-
-
-            */
         }
 
         private void SetImage(Image img)
         {
+            scale = 0;
             pictureBox1.Size = Screen.AllScreens[monitor].Bounds.Size;
             pictureBox1.Location = new Point(0, 0);
 
@@ -601,7 +729,7 @@ namespace SimpleImageViewer
             if (id < files.Length - 1)
             {
                 //time0 = DateTime.Now;
-                Image baseImage = Image.FromFile(files[id + 1]);
+                baseImage = Image.FromFile(files[id + 1]);
                 //time1 = DateTime.Now;
 
                 path = files[id + 1];
@@ -631,7 +759,7 @@ namespace SimpleImageViewer
 
             if (id > 0)
             {
-                Image baseImage = Image.FromFile(files[id - 1]);
+                baseImage = Image.FromFile(files[id - 1]);
                 path = files[id - 1];
                 //Task.Factory.StartNew(() => SetImage(img));
                 SetImage(baseImage);
@@ -644,7 +772,7 @@ namespace SimpleImageViewer
             Random rnd = new Random();
             int id = rnd.Next(files.Length);
             path = files[id];
-            Image baseImage = Image.FromFile(files[id]);
+            baseImage = Image.FromFile(files[id]);
             SetImage(baseImage);
 
         }
@@ -853,6 +981,19 @@ namespace SimpleImageViewer
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            
+
+
+            //Rectangle displayRect = GetDisplayedRectangle(baseImage, resolution);
+            //int Xloc = Convert.ToInt32(oldDisplayedRectangle.X + (e.X - displayRect.X));
+            //int Yloc = Convert.ToInt32(oldDisplayedRectangle.Y + (e.Y - displayRect.Y));
+
+            
+            //label1.Text = "X: " + Xloc + '\n'.ToString() + "Y: " + Yloc;
+            //label1.Text += '\n'.ToString() + displayRect.ToString();
+            //label1.Text += '\n'.ToString() + pictureBox1.SizeMode.ToString();
+
+
             int X = e.X;
             int Y = e.Y;
 
