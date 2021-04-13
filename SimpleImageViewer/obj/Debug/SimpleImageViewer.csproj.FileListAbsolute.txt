@@ -12,7 +12,6 @@ C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\Syst
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\System.ValueTuple.dll
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\TopShelf.ServiceInstaller.dll
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\System.ValueTuple.xml
-C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csprojAssemblyReference.cache
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.Form1.resources
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.Properties.Resources.resources
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csproj.GenerateResource.cache
@@ -22,3 +21,4 @@ C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\Simp
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csproj.CopyComplete
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.exe
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.pdb
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csprojAssemblyReference.cache
