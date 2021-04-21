@@ -122,7 +122,7 @@ namespace SimpleImageViewer
                     }
                     else if (orientation != 1)
                     {
-                        MessageBox.Show("Unknown orientation: " + orientation);
+                        //MessageBox.Show("Unknown orientation: " + orientation);
                     }
 
                 }
@@ -213,6 +213,10 @@ namespace SimpleImageViewer
                 {
                     scale += e.Delta / Math.Abs(e.Delta);
                 }
+                else
+                {
+                    //return;
+                }
             }
 
             
@@ -258,13 +262,15 @@ namespace SimpleImageViewer
             }
 
             //pictureBox1.Image.Dispose();
+            
             pictureBox1.Image = img;
 
             if (!backgroundWorker1.IsBusy)
                 backgroundWorker1.RunWorkerAsync();
 
             DateTime dt1 = DateTime.Now;
-            label1.Text += '\n'.ToString() + (dt1 - dt0).TotalMilliseconds.ToString();
+            label1.Text = '\n'.ToString() + (dt1 - dt0).TotalMilliseconds.ToString();
+
             //label1.Visible = true;
             if (label1.Text.Length > 350)
             {
@@ -295,7 +301,7 @@ namespace SimpleImageViewer
                 }
                 else if (orientation != 1)
                 {
-                    MessageBox.Show("Unknown orientation: " + orientation);
+                    //MessageBox.Show("Unknown orientation: " + orientation);
                 }
 
             }
