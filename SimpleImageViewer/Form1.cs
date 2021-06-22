@@ -47,6 +47,13 @@ namespace SimpleImageViewer
 
         int dX = 0, dY = 0;
 
+        List<string> images = new List<string>();
+        int index = -1;
+
+        string supportedExtensions = "*.jpg,*.png,*.bmp,*.jpe,*.jpeg";
+
+        bool subDirectoriesScanned = false;
+
         private void Form1_Load(object sender, EventArgs e)
         {
             pictureBox1.Controls.Add(label2);
@@ -75,6 +82,10 @@ namespace SimpleImageViewer
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\168937473_4522624104419534_2925807893586856406_n.jpg" }; // meme 276x370
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\2.9.22.12.11.jpg" }; //wide ss
 
+            //args = new string[] { "", "E:\\PHOTO ARCHIVE\\2.9.22.12.11.jpg" }; //toli
+
+            //args = new string[] { "", "G:\\ivadinis.png" }; //ivadinis
+
             {
                 /*
                 var imgKey = Registry.ClassesRoot.OpenSubKey(".bmp");
@@ -96,7 +107,7 @@ namespace SimpleImageViewer
 
                 Image img = Image.FromFile(args[1]);
 
-                string supportedExtensions = "*.jpg,*.png,*.bmp,*.jpe,*.jpeg";
+                
                 string root = Path.GetDirectoryName(path);
 
                 this.Size = new Size(resolution.Width, resolution.Height);
@@ -171,7 +182,8 @@ namespace SimpleImageViewer
                 pictureBox1.Image = bmp;
                 pictureBox1.Invalidate();
                 //pictureBox1.Image = Manipulator.ZoomImage(-1, resolution.Width / 2, resolution.Height / 2, baseImage, ref oldDisplayedRectangle, 1, pictureBox1, resolution);
-
+                images.Add(path);
+                index++;
                 
                 files = Directory.GetFiles(root, "*.*").Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
             }
@@ -179,6 +191,8 @@ namespace SimpleImageViewer
 
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
+            label1.Visible = false;
+
             bool smallImage = baseWidth < resolution.Width && baseHeight < resolution.Height;
 
             
@@ -325,6 +339,7 @@ namespace SimpleImageViewer
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
+            label1.Visible = false;
 
             if (e.KeyCode == Keys.Escape)
             {
@@ -345,7 +360,39 @@ namespace SimpleImageViewer
             }
             else if (e.KeyCode == Keys.Q)
             {
-                
+                ImageRandomPrevious();
+            }
+            else if (e.KeyCode == Keys.C)
+            {
+                if (subDirectoriesScanned)
+                    return;
+
+                //files = new DirectoryInfo(Path.GetDirectoryName(path)).GetFiles("*", SearchOption.AllDirectories).Where(x => (x.Attributes & FileAttributes.Hidden) == 0).Where(s => supportedExtensions.Contains(Path.GetExtension(s.FullName).ToLower())).Select(a => a.FullName).ToArray();
+                //files = Directory.GetFiles(Path.GetDirectoryName(path), "*", SearchOption.TopDirectoryOnly);
+                files = Directory.GetFiles(Path.GetDirectoryName(path), "*", SearchOption.AllDirectories).Where(s => ( ( (new FileInfo(s)).Attributes != FileAttributes.Hidden)) && (!s.Contains("$RECYCLE")) && supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
+                subDirectoriesScanned = true;
+
+                label1.Text = "Files: " + files.Length.ToString();
+                label1.Visible = true;
+
+                //ImageRandom();
+            }
+            else if (e.KeyCode == Keys.Z)
+            {
+                //ImageRandomPrevious();
+            }
+        }
+
+        private void ImageRandomPrevious()
+        {
+            if (index > 0)
+            {
+                images.RemoveAt(index);
+                index--;
+                path = images[index];
+                baseImage = Image.FromFile(path);
+
+                SetFullImage(baseImage);
             }
         }
 
@@ -381,6 +428,8 @@ namespace SimpleImageViewer
             int id = rnd.Next(files.Length);
             path = files[id];
             baseImage = Image.FromFile(files[id]);
+            images.Add(path);
+            index++;
             SetFullImage(baseImage);
         }
 
@@ -500,11 +549,11 @@ namespace SimpleImageViewer
             }
             else if (Math.Abs(X - resolution.Width / 2) <= 2 * reactionSize && Y < reactionSize) // middle top
             {
-                label2.Text = Path.GetFileName(path);
+                label2.Text = Path.GetFullPath(path);
                 label2.Top = 5;
-                label2.Left = resolution.Width / 2 - label2.Width;
+                label2.Left = resolution.Width / 2 - (int)label2.CreateGraphics().MeasureString(label2.Text, label2.Font).Width / 2;
                 label2.Visible = true;
-                label2.BackColor = Color.FromArgb(65, 33, 33, 33);
+                label2.BackColor = Color.FromArgb(120, 33, 33, 33);
                 pictureBox2.Visible = false;
             }
             else
