@@ -81,6 +81,7 @@ namespace SimpleImageViewer
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\DSC_3432.jpg" }; //landscape
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\168937473_4522624104419534_2925807893586856406_n.jpg" }; // meme 276x370
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\2.9.22.12.11.jpg" }; //wide ss
+            args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\verybig.jpg" }; //very big
 
             //args = new string[] { "", "E:\\PHOTO ARCHIVE\\2.9.22.12.11.jpg" }; //toli
 
@@ -191,6 +192,11 @@ namespace SimpleImageViewer
 
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
+            if (e.Delta < 0 && scale == 0)
+            {
+                return;
+            }
+
             label1.Visible = false;
 
             bool smallImage = baseWidth < resolution.Width && baseHeight < resolution.Height;
@@ -267,20 +273,51 @@ namespace SimpleImageViewer
 
                 Rectangle rect = Manipulator.GetZoomedRectangle(e.Delta, e.X, e.Y, baseWidth, baseHeight, oldDisplayedRectangle, scale, resolution);
                 oldDisplayedRectangle = rect;
-                img = Manipulator.ZoomInImage(e.X, e.Y, pictureBox1.Image, resolution, 2);
+                img = Manipulator.ZoomInImage(e.X, e.Y, pictureBox1.Image, resolution, 10);
 
             }
             else
             {
-                img = Manipulator.ZoomImage(e.Delta, e.X, e.Y, baseImage, ref oldDisplayedRectangle, scale, resolution, 5);
+                //Console.WriteLine("without");
+
+                
+                if (!backgroundWorker1.IsBusy)
+                {
+                    //Console.WriteLine("Start main");
+                    backgroundWorker1.RunWorkerAsync(10);
+                }
+                else
+                {
+                    //Console.WriteLine("Start Second");
+                    BackgroundWorker bw = new BackgroundWorker();
+                    bw.DoWork += backgroundWorker1_DoWork;
+                    bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
+                    bw.RunWorkerAsync(10);
+                }
+                
+
+
+                //img = Manipulator.ZoomImage(e.Delta, e.X, e.Y, baseImage, ref oldDisplayedRectangle, scale, resolution, 10);
             }
 
             //pictureBox1.Image.Dispose();
-            
-            pictureBox1.Image = img;
+
+            //pictureBox1.Image = loadImage;
 
             if (!backgroundWorker1.IsBusy)
-                backgroundWorker1.RunWorkerAsync();
+            {
+                //Console.WriteLine("Start main");
+                backgroundWorker1.RunWorkerAsync(1);
+                
+            }
+            else
+            {
+                //Console.WriteLine("Start Second");
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += backgroundWorker1_DoWork;
+                bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
+                bw.RunWorkerAsync(1);
+            }
 
             DateTime dt1 = DateTime.Now;
             label1.Text = '\n'.ToString() + (dt1 - dt0).TotalMilliseconds.ToString();
@@ -405,6 +442,8 @@ namespace SimpleImageViewer
                 baseImage = Image.FromFile(files[id + 1]);
 
                 path = files[id + 1];
+                images.Add(path);
+                index++;
                 SetFullImage(baseImage);
             }
 
@@ -418,6 +457,12 @@ namespace SimpleImageViewer
             {
                 baseImage = Image.FromFile(files[id - 1]);
                 path = files[id - 1];
+
+                if (index > 0)
+                {
+                    images.RemoveAt(index);
+                    index--;
+                }
                 SetFullImage(baseImage);
             }
         }
@@ -447,11 +492,14 @@ namespace SimpleImageViewer
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            
+
             //label1.Visible = true;
             if (e.Button == MouseButtons.Left)
             {
+
                 //pictureBox1.Image = ZoomImage(0, e.X, e.Y, baseImage);
-                DateTime dt0 = DateTime.Now;
+                //DateTime dt0 = DateTime.Now;
                 oldDisplayedRectangle.X += (dX - e.X) * oldDisplayedRectangle.Width / resolution.Width;
                 oldDisplayedRectangle.Y += (dY - e.Y) * oldDisplayedRectangle.Height / resolution.Height;
 
@@ -473,6 +521,9 @@ namespace SimpleImageViewer
                 }
                 */
                 //Rectangle rect = new Rectangle(oldDisplayedRectangle.X + (dX - e.X) * oldDisplayedRectangle.Width / resolution.Width, oldDisplayedRectangle.Y + (dY - e.Y) * oldDisplayedRectangle.Height / resolution.Height, oldDisplayedRectangle.Width, oldDisplayedRectangle.Height);
+
+
+                /*
                 Bitmap bmp = new Bitmap(oldDisplayedRectangle.Width, oldDisplayedRectangle.Height);
 
                 using (Graphics g = Graphics.FromImage(bmp))
@@ -480,18 +531,60 @@ namespace SimpleImageViewer
                     g.DrawImage(baseImage, new Rectangle(0, 0, oldDisplayedRectangle.Width, oldDisplayedRectangle.Height), rect, GraphicsUnit.Pixel);
                 }
 
-                DateTime dt1 = DateTime.Now;
+                */
 
+                ed = 0;
+                ex = 0;
+                ey = 0;
+
+                /*
+                if (!backgroundWorker1.IsBusy)
+                {
+                    Console.WriteLine("Start main");
+                    backgroundWorker1.RunWorkerAsync(10);
+                }
+                else
+                {
+                    Console.WriteLine("Start Second");
+                    BackgroundWorker bw = new BackgroundWorker();
+                    bw.DoWork += backgroundWorker1_DoWork;
+                    bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
+                    bw.RunWorkerAsync(10);
+                }
+                */
+
+                if (!backgroundWorker1.IsBusy)
+                {
+                    //Console.WriteLine("Start main");
+                    backgroundWorker1.RunWorkerAsync(1);
+                }
+                else
+                {
+                    //Console.WriteLine("Start Second");
+                    BackgroundWorker bw = new BackgroundWorker();
+                    bw.DoWork += backgroundWorker1_DoWork;
+                    bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
+                    bw.RunWorkerAsync(1);
+                }
+
+
+
+                //DateTime dt1 = DateTime.Now;
+
+                //Console.WriteLine('\n'.ToString() + (dt1 - dt0).TotalMilliseconds.ToString());
+
+                /*
                 label1.Text += '\n'.ToString() + (dt1 - dt0).TotalMilliseconds.ToString(); 
 
                 if (label1.Text.Length > 350)
                 {
                     label1.Text = "";
                 }
+                */
 
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = bmp;
-                pictureBox1.Invalidate();
+                //pictureBox1.Image.Dispose();
+                //pictureBox1.Image = bmp;
+                //pictureBox1.Invalidate();
 
                 dX = e.X;
                 dY = e.Y;
@@ -561,6 +654,8 @@ namespace SimpleImageViewer
                 label2.Visible = false;
                 pictureBox2.Visible = false;
             }
+
+            
         }
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
@@ -686,7 +781,21 @@ namespace SimpleImageViewer
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            loadImage = Manipulator.ZoomImage(ed, ex, ey, baseImage, ref oldDisplayedRectangle, scale, resolution, 1);
+            int level = (int)(e.Argument);
+
+            Console.WriteLine("Start: " + level);
+            //Console.WriteLine("Start");
+            //Console.WriteLine("normal");
+            DateTime dt0 = DateTime.Now;
+            oldDisplayedRectangle = Manipulator.GetRectangle(oldDisplayedRectangle, resolution, ed, ex, ey, baseImage.Size, scale);
+            DateTime dt1 = DateTime.Now;
+            
+            loadImage = Manipulator.ZoomImage((Image)baseImage.Clone(), oldDisplayedRectangle, resolution, level);
+
+            DateTime dt2= DateTime.Now;
+
+            Console.WriteLine(level + " Rect: " + (dt1 - dt0).TotalMilliseconds.ToString());
+            Console.WriteLine(level + " Draw: " + (dt2 - dt1).TotalMilliseconds.ToString());
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -696,7 +805,9 @@ namespace SimpleImageViewer
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            
             pictureBox1.Image = loadImage;
+            //Console.WriteLine("End");
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)

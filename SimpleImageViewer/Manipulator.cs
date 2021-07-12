@@ -46,8 +46,85 @@ namespace SimpleImageViewer
             return new Rectangle(x, y, width, height);
         }
 
+        public static Rectangle GetRectangle(Rectangle oldDisplayedRectangle, Rectangle resolution, int delta, int eX, int eY, Size baseImageRectangle, int scale)
+        {
+            double zoomFactor = 0.85;
+            double displayRatio = (double)resolution.Width / resolution.Height;
+
+            int width, height;
+
+            if ((double)baseImageRectangle.Width / resolution.Width > (double)baseImageRectangle.Height / resolution.Height)
+            {//Wide picture
+
+                width = Convert.ToInt32(baseImageRectangle.Width * Math.Pow(zoomFactor, scale));
+                height = Convert.ToInt32(width / displayRatio);
+
+            }
+            else
+            {//Tall picture
+
+                height = Convert.ToInt32(baseImageRectangle.Height * Math.Pow(zoomFactor, scale));
+                width = Convert.ToInt32(height * displayRatio);
+            }
+
+            int x = oldDisplayedRectangle.X + ((oldDisplayedRectangle.Width - width)) * eX / (resolution.Width);
+            int y = oldDisplayedRectangle.Y + ((oldDisplayedRectangle.Height - height)) * eY / (resolution.Height);
+
+
+            if (delta < 0)
+            {
+
+                if (x + width > baseImageRectangle.Width)
+                {
+                    x = baseImageRectangle.Width - width;
+                }
+
+                if (y + height > baseImageRectangle.Height)
+                {
+                    y = baseImageRectangle.Height - height;
+                }
+
+                if (x < 0)
+                {
+                    x = 0;
+
+                    if (x + width > baseImageRectangle.Width)
+                    {
+                        x = (baseImageRectangle.Width - width) / 2;
+                    }
+                }
+
+                if (y < 0)
+                {
+                    y = 0;
+
+                    if (y + height > baseImageRectangle.Height)
+                    {
+                        y = (baseImageRectangle.Height - height) / 2;
+                    }
+                }
+            }
+            else
+            {
+                if (x < 0 || x + width > baseImageRectangle.Width)
+                {
+                    x = 0;
+                    width = baseImageRectangle.Width;
+                }
+
+                if (y < 0 || y + height > baseImageRectangle.Height)
+                {
+                    y = 0;
+                    height = baseImageRectangle.Height;
+                }
+            }
+
+            return new Rectangle(x, y, width, height);
+        }
+
         public static Image ZoomImage(int delta, int eX, int eY, Image baseImage, ref Rectangle oldDisplayedRectangle, int scale, Rectangle resolution, int sizeReduceFactor)
         {
+            Console.WriteLine("zvoom");
             double zoomFactor = 0.85;
 
             /*
@@ -159,6 +236,52 @@ namespace SimpleImageViewer
 
             using (Graphics g = Graphics.FromImage(bmp))
             {
+                g.DrawImage(baseImage, new Rectangle(0, 0, displayWidth, displayHeight), oldDisplayedRectangle, GraphicsUnit.Pixel);
+            }
+
+            //baseImage.Dispose();
+
+            return bmp;
+        }
+
+        public static Image ZoomImage(Image baseImage, Rectangle oldDisplayedRectangle, Rectangle resolution, int sizeReduceFactor)
+        {
+            //Console.WriteLine("zvoom");
+
+            bool widePicture = true;
+
+            if ((double)baseImage.Width / resolution.Width > (double)baseImage.Height / resolution.Height)
+            {//Wide picture
+
+            }
+            else
+            {//Tall picture
+
+                widePicture = false;
+            }
+
+            int displayWidth, displayHeight;
+
+
+            if (widePicture)
+            {
+                displayWidth = resolution.Width;
+                displayHeight = oldDisplayedRectangle.Height * resolution.Width / oldDisplayedRectangle.Width;
+            }
+            else
+            {
+                displayHeight = resolution.Height;
+                displayWidth = oldDisplayedRectangle.Width * resolution.Height / oldDisplayedRectangle.Height;
+            }
+
+            displayHeight /= sizeReduceFactor;
+            displayWidth /= sizeReduceFactor;
+
+            Bitmap bmp = new Bitmap(displayWidth, displayHeight);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
                 g.DrawImage(baseImage, new Rectangle(0, 0, displayWidth, displayHeight), oldDisplayedRectangle, GraphicsUnit.Pixel);
             }
 

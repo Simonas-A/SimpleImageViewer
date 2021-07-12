@@ -21,4 +21,4 @@ C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\Simp
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csproj.CopyComplete
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.exe
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.pdb
-C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csprojAssemblyReference.cache
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csproj.AssemblyReference.cache
