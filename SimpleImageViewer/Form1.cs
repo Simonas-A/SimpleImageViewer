@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
@@ -33,6 +34,8 @@ namespace SimpleImageViewer
 
         string[] files;
 
+        bool AttributesRead = false;
+
 
         int baseWidth, baseHeight;
         Image baseImage;
@@ -54,8 +57,39 @@ namespace SimpleImageViewer
 
         bool subDirectoriesScanned = false;
 
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            listView1.Columns.Add("", 100);
+
+            listView1.Columns.Add("", 160);
+
+
+            /*
+            ListViewItem item = new ListViewItem("viens");
+            item.SubItems.Add("OBANA123");
+
+            ListViewItem item1 = new ListViewItem("du");
+            item1.SubItems.Add("OBANA123");
+
+            ListViewItem item2 = new ListViewItem("tryyys");
+            item2.SubItems.Add("OBANA123");
+
+
+            listView1.Items.Add(item);
+            listView1.Items.Add(item1);
+            listView1.Items.Add(item2);
+
+
+            listView1.BackColor = Color.FromArgb(33, 33, 33);
+            listView1.ForeColor = Color.Lime;
+
+            listView1.Items[0].BackColor = Color.FromArgb(33, 33, 33);
+            listView1.Invalidate();
+            */
+
+
             pictureBox1.Controls.Add(label2);
             pictureBox1.Controls.Add(pictureBox2);
             pictureBox2.Image = Properties.Resources.left;
@@ -67,6 +101,10 @@ namespace SimpleImageViewer
             label1.Text = "";
             label1.Visible = false;
             //label2.Text = "";
+
+
+            listView1.Left = (resolution.Width - listView1.Width) / 2;
+            listView1.Top = (resolution.Height - listView1.Height);
 
 
             //BackColor = Color.FromArgb(33, 33, 33);
@@ -85,6 +123,7 @@ namespace SimpleImageViewer
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\2.9.22.12.11.jpg" }; //wide ss
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\verybig.jpg" }; //very big
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\perfect.png" }; //resolution size
+            //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\IMG_7650.jpg" }; //has a lot of attributes
 
             //args = new string[] { "", "E:\\PHOTO ARCHIVE\\2.9.22.12.11.jpg" }; //toli
 
@@ -204,7 +243,7 @@ namespace SimpleImageViewer
 
             bool smallImage = baseWidth < resolution.Width && baseHeight < resolution.Height;
 
-            
+
             if (smallImage)
             {
                 if (e.Delta > 0)
@@ -242,12 +281,12 @@ namespace SimpleImageViewer
                 }
             }
 
-            
+
 
             //scale += e.Delta / Math.Abs(e.Delta);
 
             DateTime dt0 = DateTime.Now;
-            Image img;
+            //Image img;
 
             ed = e.Delta;
             ex = e.X;
@@ -274,25 +313,25 @@ namespace SimpleImageViewer
             }
                 */
 
+
+                /*
                 Rectangle rect = Manipulator.GetZoomedRectangle(e.Delta, e.X, e.Y, baseWidth, baseHeight, oldDisplayedRectangle, scale, resolution);
                 oldDisplayedRectangle = rect;
-
-
-
                 img = Manipulator.ZoomInImage(e.X, e.Y, pictureBox1.Image, resolution, 10);
+                */
 
             }
             else
             {
                 //Console.WriteLine("without");
 
-                double bound = scale;
+                //double bound = scale;
 
                 //for (int i = 0; i < 10; i++)
                 //{
                 //scale = bound + 1 - ((double)i / 9);
 
-
+                /*
                 if (!backgroundWorker1.IsBusy)
                 {
                     //Console.WriteLine("Start main");
@@ -307,6 +346,8 @@ namespace SimpleImageViewer
                     bw.RunWorkerAsync(10);
                 }
 
+                */
+
                 //}
 
                 //img = Manipulator.ZoomImage(e.Delta, e.X, e.Y, baseImage, ref oldDisplayedRectangle, scale, resolution, 10);
@@ -316,11 +357,12 @@ namespace SimpleImageViewer
 
             //pictureBox1.Image = loadImage;
 
+
             if (!backgroundWorker1.IsBusy)
             {
                 //Console.WriteLine("Start main");
-                backgroundWorker1.RunWorkerAsync(1);
-                
+                backgroundWorker1.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
+
             }
             else
             {
@@ -328,8 +370,9 @@ namespace SimpleImageViewer
                 BackgroundWorker bw = new BackgroundWorker();
                 bw.DoWork += backgroundWorker1_DoWork;
                 bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
-                bw.RunWorkerAsync(1);
+                bw.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
             }
+
 
             DateTime dt1 = DateTime.Now;
             label1.Text = '\n'.ToString() + (dt1 - dt0).TotalMilliseconds.ToString();
@@ -343,6 +386,8 @@ namespace SimpleImageViewer
 
         private void SetFullImage(Image img)
         {
+            AttributesRead = false;
+
             scale = 0;
 
             pictureBox1.Image.Dispose();
@@ -523,7 +568,7 @@ namespace SimpleImageViewer
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            
+
 
             //label1.Visible = true;
             if (e.Button == MouseButtons.Left)
@@ -591,7 +636,7 @@ namespace SimpleImageViewer
                 if (!backgroundWorker1.IsBusy)
                 {
                     //Console.WriteLine("Start main");
-                    backgroundWorker1.RunWorkerAsync(1);
+                    backgroundWorker1.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
                 }
                 else
                 {
@@ -599,7 +644,7 @@ namespace SimpleImageViewer
                     BackgroundWorker bw = new BackgroundWorker();
                     bw.DoWork += backgroundWorker1_DoWork;
                     bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
-                    bw.RunWorkerAsync(1);
+                    bw.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
                 }
 
 
@@ -625,72 +670,105 @@ namespace SimpleImageViewer
                 dY = e.Y;
                 //oldDisplayedRectangle = rect;
             }
-
-            int X = e.X;
-            int Y = e.Y;
-
-            int reactionSize = 150;
-
-            pictureBox2.Width = 100;
-            pictureBox2.Height = 100;
-            pictureBox2.Image.Dispose();
-            
-
-            if (X >= resolution.Width - reactionSize && Y <= reactionSize) //top right
-            {
-                pictureBox2.Image = Properties.Resources.close;
-                pictureBox2.Left = resolution.Width - pictureBox2.Width;
-                pictureBox2.Top = 0;
-                pictureBox2.Visible = true;
-            }
-            else if (X >= resolution.Width - reactionSize && Y >= resolution.Height - reactionSize) //bottom right
-            {
-                pictureBox2.Visible = false;
-            }
-            else if (X <= reactionSize && Y >= resolution.Height - reactionSize) // bottom left
-            {
-                pictureBox2.Image = Properties.Resources.monitor;
-                pictureBox2.Left = 0;
-                pictureBox2.Top = resolution.Height - pictureBox2.Width;
-                pictureBox2.Visible = true;
-            }
-            else if (X <= reactionSize && Y <= reactionSize) // top left
-            {
-                pictureBox2.Image = Properties.Resources.minimize;
-                pictureBox2.Left = 0;
-                pictureBox2.Top = 0;
-                pictureBox2.Visible = true;
-            }
-            else if (X >= resolution.Width - reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle right
-            {
-                pictureBox2.Image = Properties.Resources.right;
-                pictureBox2.Left = resolution.Width - pictureBox2.Width;
-                pictureBox2.Top = resolution.Height / 2 - pictureBox2.Height / 2;
-                pictureBox2.Visible = true;
-            }
-            else if (X <= reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle left
-            {
-                pictureBox2.Image = Properties.Resources.left;
-                pictureBox2.Left = 0;
-                pictureBox2.Top = resolution.Height / 2 - pictureBox2.Height / 2;
-                pictureBox2.Visible = true;
-            }
-            else if (Math.Abs(X - resolution.Width / 2) <= 2 * reactionSize && Y < reactionSize) // middle top
-            {
-                label2.Text = Path.GetFullPath(path);
-                label2.Top = 5;
-                label2.Left = resolution.Width / 2 - (int)label2.CreateGraphics().MeasureString(label2.Text, label2.Font).Width / 2;
-                label2.Visible = true;
-                label2.BackColor = Color.FromArgb(120, 33, 33, 33);
-                pictureBox2.Visible = false;
-            }
             else
             {
+
                 label2.Visible = false;
                 pictureBox2.Visible = false;
+                
+
+                int X = e.X;
+                int Y = e.Y;
+
+                int reactionSize = 150;
+
+                pictureBox2.Width = 100;
+                pictureBox2.Height = 100;
+                pictureBox2.Image.Dispose();
+
+
+                if (X >= resolution.Width - reactionSize && Y <= reactionSize) //top right
+                {
+                    pictureBox2.Image = Properties.Resources.close;
+                    pictureBox2.Left = resolution.Width - pictureBox2.Width;
+                    pictureBox2.Top = 0;
+                    pictureBox2.Visible = true;
+                }
+                else if (X >= resolution.Width - reactionSize && Y >= resolution.Height - reactionSize) //bottom right
+                {
+                }
+                else if (X <= reactionSize && Y >= resolution.Height - reactionSize) // bottom left
+                {
+                    pictureBox2.Image = Properties.Resources.monitor;
+                    pictureBox2.Left = 0;
+                    pictureBox2.Top = resolution.Height - pictureBox2.Width;
+                    pictureBox2.Visible = true;
+                }
+                else if (X <= reactionSize && Y <= reactionSize) // top left
+                {
+                    pictureBox2.Image = Properties.Resources.minimize;
+                    pictureBox2.Left = 0;
+                    pictureBox2.Top = 0;
+                    pictureBox2.Visible = true;
+                }
+                else if (X >= resolution.Width - reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle right
+                {
+                    pictureBox2.Image = Properties.Resources.right;
+                    pictureBox2.Left = resolution.Width - pictureBox2.Width;
+                    pictureBox2.Top = resolution.Height / 2 - pictureBox2.Height / 2;
+                    pictureBox2.Visible = true;
+                }
+                else if (X <= reactionSize && Math.Abs(Y - resolution.Height / 2) <= 2 * reactionSize) // middle left
+                {
+                    pictureBox2.Image = Properties.Resources.left;
+                    pictureBox2.Left = 0;
+                    pictureBox2.Top = resolution.Height / 2 - pictureBox2.Height / 2;
+                    pictureBox2.Visible = true;
+                }
+                else if (Math.Abs(X - resolution.Width / 2) <= 2 * reactionSize && Y < reactionSize) // middle top
+                {
+                    label2.Text = Path.GetFullPath(path);
+                    label2.Top = 5;
+                    label2.Left = resolution.Width / 2 - (int)label2.CreateGraphics().MeasureString(label2.Text, label2.Font).Width / 2;
+                    label2.Visible = true;
+                    label2.BackColor = Color.FromArgb(120, 33, 33, 33);
+                }
+                else if (Math.Abs(X - resolution.Width / 2) <= 2 * reactionSize && Y >= resolution.Height - reactionSize) // Bottom middle
+                {
+                    listView1.Visible = true;
+
+                    if (!AttributesRead)
+                    {
+                        FillListView();
+                    }
+
+                    return;
+                }
+                else
+                {
+                    
+                }
+
+                listView1.Visible = false;
             }
 
             
+        }
+
+        private void FillListView()
+        {
+            listView1.Items.Clear();
+
+            ListViewItem item0 = new ListViewItem("Width");
+            item0.SubItems.Add(baseWidth.ToString());
+
+            ListViewItem item1 = new ListViewItem("Height");
+            item1.SubItems.Add(baseHeight.ToString());
+
+            listView1.Items.Add(item0);
+            listView1.Items.Add(item1);
+
+            AttributesRead = true;
         }
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
@@ -814,14 +892,51 @@ namespace SimpleImageViewer
             Cursor.Current = Cursors.Default;
         }
 
+        private void listView1_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
+        {
+            e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(33, 33, 33)), e.Bounds);
+            
+            //e.DrawBackground();
+            e.DrawText();
+            e.Graphics.DrawString(Path.GetFileName(path), DefaultFont, Brushes.Lime, 0, 0);
+
+            /*
+            using (var sf = new StringFormat())
+            {
+                sf.Alignment = StringAlignment.Center;
+
+                using (var headerFont = new Font("Microsoft Sans Serif", 9, FontStyle.Bold))
+                {
+                    e.Graphics.DrawString(e.Header.Text, headerFont,
+                        Brushes.Lime, e.Bounds, sf);
+                }
+            }
+            */
+        }
+
+        private void listView1_DrawItem(object sender, DrawListViewItemEventArgs e)
+        {
+            e.DrawDefault = true;
+        }
+
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            int level = (int)(e.Argument);
+            Tuple<int,Image> args = (Tuple<int, Image>)(e.Argument);
 
-            Console.WriteLine("Start: " + level);
+            int level = args.Item1;
+
+            Image img = args.Item2;
+
+            //Console.WriteLine("Start: " + level);
             //Console.WriteLine("Start");
             //Console.WriteLine("normal");
             DateTime dt0 = DateTime.Now;
+
+
+            //GCHandle gch = GCHandle.Alloc(img, GCHandleType.Normal);
+            //IntPtr pObj = gch.();
+
+            //Console.WriteLine(pObj.ToString());
 
 
             oldDisplayedRectangle = Manipulator.GetRectangle(oldDisplayedRectangle, resolution, ed, ex, ey, baseImage.Size, scale);
@@ -829,14 +944,14 @@ namespace SimpleImageViewer
 
             DateTime dt1 = DateTime.Now;
 
-            loadImage = Manipulator.ZoomImage((Image)baseImage.Clone(), oldDisplayedRectangle, resolution, level);
+            loadImage = Manipulator.ZoomImage(img, oldDisplayedRectangle, resolution, level);
 
-            Console.WriteLine("End: " + level);
+            //Console.WriteLine("End: " + level);
 
             DateTime dt2= DateTime.Now;
 
-            Console.WriteLine(level + " Rect: " + (dt1 - dt0).TotalMilliseconds.ToString());
-            Console.WriteLine(level + " Draw: " + (dt2 - dt1).TotalMilliseconds.ToString());
+            //Console.WriteLine(level + " Rect: " + (dt1 - dt0).TotalMilliseconds.ToString());
+            //Console.WriteLine(level + " Draw: " + (dt2 - dt1).TotalMilliseconds.ToString());
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -846,7 +961,10 @@ namespace SimpleImageViewer
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            
+            if (e.Error != null)
+            {
+                Console.WriteLine(e.Error.Message);
+            }
             pictureBox1.Image = loadImage;
             //Console.WriteLine("End");
         }
