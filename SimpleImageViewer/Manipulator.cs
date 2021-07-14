@@ -46,7 +46,7 @@ namespace SimpleImageViewer
             return new Rectangle(x, y, width, height);
         }
 
-        public static Rectangle GetRectangle(Rectangle oldDisplayedRectangle, Rectangle resolution, int delta, int eX, int eY, Size baseImageRectangle, int scale)
+        public static Rectangle GetRectangle(Rectangle oldDisplayedRectangle, Rectangle resolution, int delta, int eX, int eY, Size baseImageRectangle, double scale)
         {
             double zoomFactor = 0.85;
             double displayRatio = (double)resolution.Width / resolution.Height;
@@ -375,13 +375,13 @@ namespace SimpleImageViewer
             return bmp;
         }
      
-        public static Rectangle GetZoomedRectangle(int delta, int eX, int eY, int baseWidth, int baseHeight, Rectangle oldDisplayedRectangle, int scale, Rectangle resolution)
+        public static Rectangle GetZoomedRectangle(int delta, int eX, int eY, int baseWidth, int baseHeight, Rectangle oldDisplayedRectangle, double scale, Rectangle resolution)
         {
             double zoomFactor = 0.85;
             double displayRatio = (double)resolution.Width / resolution.Height;
             int width, height;
 
-            if ((double)baseWidth / resolution.Width > (double)baseHeight / resolution.Height)
+            if ((double)baseWidth / resolution.Width >= (double)baseHeight / resolution.Height)
             {//Wide picture
 
                 width = Convert.ToInt32(baseWidth * Math.Pow(zoomFactor, scale));
@@ -432,7 +432,7 @@ namespace SimpleImageViewer
                     }
                 }
             }
-            else
+            else if (delta > 0)
             {
                 if (x < 0 || x + width > baseWidth)
                 {
@@ -444,6 +444,28 @@ namespace SimpleImageViewer
                 {
                     y = 0;
                     height = baseHeight;
+                }
+            }
+            else
+            {
+                if (x < 0)
+                {
+                    x = 0;
+                }
+
+                if (x + width > baseWidth)/// bad
+                {
+                    x = baseWidth - width;
+                }
+
+                if (y < 0)
+                {
+                    y = 0;
+                }
+
+                if (y + height > baseHeight)
+                {
+                    y = baseHeight - height;
                 }
             }
 

@@ -39,7 +39,7 @@ namespace SimpleImageViewer
 
         Image loadImage;
 
-        int scale = 0;
+        double scale = 0;
 
         Rectangle resolution;
 
@@ -77,11 +77,14 @@ namespace SimpleImageViewer
 
             string[] args = Environment.GetCommandLineArgs();
 
+            //Different pictures for testing
+
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\DSC_3314.jpg" }; //portrait
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\DSC_3432.jpg" }; //landscape
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\168937473_4522624104419534_2925807893586856406_n.jpg" }; // meme 276x370
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\2.9.22.12.11.jpg" }; //wide ss
-            args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\verybig.jpg" }; //very big
+            //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\verybig.jpg" }; //very big
+            //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\perfect.png" }; //resolution size
 
             //args = new string[] { "", "E:\\PHOTO ARCHIVE\\2.9.22.12.11.jpg" }; //toli
 
@@ -250,29 +253,32 @@ namespace SimpleImageViewer
             ex = e.X;
             ey = e.Y;
 
-            
+
 
             if (e.Delta > 0)
             {
-                
-                    /*
-                if (backgroundWorker1.IsBusy)
-                {
-                    
-                    backgroundWorker1.CancelAsync();
 
-                    while (!backgroundWorker1.IsBusy)
-                        backgroundWorker1.RunWorkerAsync();
-                
-                }
-                else
-                {
+                /*
+            if (backgroundWorker1.IsBusy)
+            {
+
+                backgroundWorker1.CancelAsync();
+
+                while (!backgroundWorker1.IsBusy)
                     backgroundWorker1.RunWorkerAsync();
-                }
-                    */
+
+            }
+            else
+            {
+                backgroundWorker1.RunWorkerAsync();
+            }
+                */
 
                 Rectangle rect = Manipulator.GetZoomedRectangle(e.Delta, e.X, e.Y, baseWidth, baseHeight, oldDisplayedRectangle, scale, resolution);
                 oldDisplayedRectangle = rect;
+
+
+
                 img = Manipulator.ZoomInImage(e.X, e.Y, pictureBox1.Image, resolution, 10);
 
             }
@@ -280,7 +286,13 @@ namespace SimpleImageViewer
             {
                 //Console.WriteLine("without");
 
-                
+                double bound = scale;
+
+                //for (int i = 0; i < 10; i++)
+                //{
+                //scale = bound + 1 - ((double)i / 9);
+
+
                 if (!backgroundWorker1.IsBusy)
                 {
                     //Console.WriteLine("Start main");
@@ -294,8 +306,8 @@ namespace SimpleImageViewer
                     bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
                     bw.RunWorkerAsync(10);
                 }
-                
 
+                //}
 
                 //img = Manipulator.ZoomImage(e.Delta, e.X, e.Y, baseImage, ref oldDisplayedRectangle, scale, resolution, 10);
             }
@@ -424,7 +436,7 @@ namespace SimpleImageViewer
         {
             if (index > 0)
             {
-                images.RemoveAt(index);
+                //images.RemoveAt(index);
                 index--;
                 path = images[index];
                 baseImage = Image.FromFile(path);
@@ -439,6 +451,11 @@ namespace SimpleImageViewer
 
             if (id < files.Length - 1)
             {
+                if (index < images.Count - 1)
+                {
+
+                }
+
                 baseImage = Image.FromFile(files[id + 1]);
 
                 path = files[id + 1];
@@ -469,12 +486,26 @@ namespace SimpleImageViewer
 
         private void ImageRandom()
         {
-            Random rnd = new Random();
-            int id = rnd.Next(files.Length);
-            path = files[id];
-            baseImage = Image.FromFile(files[id]);
-            images.Add(path);
+            int id;
+
+            if (index < images.Count - 1)
+            {
+
+                id = index + 1;
+                path = images[id];
+            }
+            else
+            {
+                Random rnd = new Random();
+                id = rnd.Next(files.Length);
+                path = files[id];
+                images.Add(path);
+            }
+
+            baseImage = Image.FromFile(path);
+            
             index++;
+
             SetFullImage(baseImage);
         }
 
@@ -503,7 +534,13 @@ namespace SimpleImageViewer
                 oldDisplayedRectangle.X += (dX - e.X) * oldDisplayedRectangle.Width / resolution.Width;
                 oldDisplayedRectangle.Y += (dY - e.Y) * oldDisplayedRectangle.Height / resolution.Height;
 
-                Rectangle rect = oldDisplayedRectangle;
+                //Rectangle rect = oldDisplayedRectangle;
+
+                oldDisplayedRectangle = Manipulator.GetZoomedRectangle(0, e.X, e.Y, baseWidth, baseHeight, oldDisplayedRectangle, scale, resolution);
+
+                ed = 0;
+                ex = 0;
+                ey = 0;
 
                 /*
                 bool widePicture = (double)baseWidth / resolution.Width > (double)baseHeight / resolution.Height;
@@ -533,9 +570,7 @@ namespace SimpleImageViewer
 
                 */
 
-                ed = 0;
-                ex = 0;
-                ey = 0;
+
 
                 /*
                 if (!backgroundWorker1.IsBusy)
@@ -787,10 +822,16 @@ namespace SimpleImageViewer
             //Console.WriteLine("Start");
             //Console.WriteLine("normal");
             DateTime dt0 = DateTime.Now;
+
+
             oldDisplayedRectangle = Manipulator.GetRectangle(oldDisplayedRectangle, resolution, ed, ex, ey, baseImage.Size, scale);
+
+
             DateTime dt1 = DateTime.Now;
-            
+
             loadImage = Manipulator.ZoomImage((Image)baseImage.Clone(), oldDisplayedRectangle, resolution, level);
+
+            Console.WriteLine("End: " + level);
 
             DateTime dt2= DateTime.Now;
 
