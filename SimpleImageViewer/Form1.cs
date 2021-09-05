@@ -124,6 +124,7 @@ namespace SimpleImageViewer
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\verybig.jpg" }; //very big
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\perfect.png" }; //resolution size
             //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\IMG_7650.jpg" }; //has a lot of attributes
+            //args = new string[] { "", "C:\\Users\\Simuxxl\\Desktop\\Captures\\2.4.13.40.42.jpg" }; //folder
 
             //args = new string[] { "", "E:\\PHOTO ARCHIVE\\2.9.22.12.11.jpg" }; //toli
 
@@ -190,6 +191,8 @@ namespace SimpleImageViewer
                     pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
                 }
 
+
+                listView1.BackColor = Color.FromArgb(33, 33, 33);
 
                 baseImage = img;
 
@@ -358,20 +361,12 @@ namespace SimpleImageViewer
             //pictureBox1.Image = loadImage;
 
 
-            if (!backgroundWorker1.IsBusy)
-            {
-                //Console.WriteLine("Start main");
-                backgroundWorker1.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
+            //Console.WriteLine("Start Second");
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += backgroundWorker1_DoWork;
+            bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
+            bw.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage.Clone()));
 
-            }
-            else
-            {
-                //Console.WriteLine("Start Second");
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.DoWork += backgroundWorker1_DoWork;
-                bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
-                bw.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
-            }
 
 
             DateTime dt1 = DateTime.Now;
@@ -633,21 +628,13 @@ namespace SimpleImageViewer
                 }
                 */
 
-                if (!backgroundWorker1.IsBusy)
-                {
-                    //Console.WriteLine("Start main");
-                    backgroundWorker1.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
-                }
-                else
-                {
-                    //Console.WriteLine("Start Second");
-                    BackgroundWorker bw = new BackgroundWorker();
-                    bw.DoWork += backgroundWorker1_DoWork;
-                    bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
-                    bw.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
-                }
 
+                //Console.WriteLine("Start Second");
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += backgroundWorker1_DoWork;
+                bw.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
 
+                bw.RunWorkerAsync(new Tuple<int, Image>(1, (Bitmap)baseImage));
 
                 //DateTime dt1 = DateTime.Now;
 
@@ -675,7 +662,7 @@ namespace SimpleImageViewer
 
                 label2.Visible = false;
                 pictureBox2.Visible = false;
-                
+
 
                 int X = e.X;
                 int Y = e.Y;
@@ -746,7 +733,7 @@ namespace SimpleImageViewer
                 }
                 else
                 {
-                    
+
                 }
 
                 listView1.Visible = false;
@@ -761,12 +748,31 @@ namespace SimpleImageViewer
 
             ListViewItem item0 = new ListViewItem("Width");
             item0.SubItems.Add(baseWidth.ToString());
+            item0.BackColor = Color.FromArgb(33, 33, 33);
+            item0.ForeColor = Color.Lime;
 
             ListViewItem item1 = new ListViewItem("Height");
             item1.SubItems.Add(baseHeight.ToString());
+            item1.BackColor = Color.FromArgb(33, 33, 33);
+            item1.ForeColor = Color.Lime;
+
+            ListViewItem item2 = new ListViewItem("Date created");
+            item2.SubItems.Add(File.GetCreationTime(path).ToString());
+            item2.BackColor = Color.FromArgb(33, 33, 33);
+            item2.ForeColor = Color.Lime;
+
+            /*
+            ListViewItem item3 = new ListViewItem("Date modified");
+            item3.SubItems.Add(File.GetLastWriteTime(path).ToString());
+            item3.BackColor = Color.FromArgb(33, 33, 33);
+            item3.ForeColor = Color.Lime;
+            */
+
 
             listView1.Items.Add(item0);
             listView1.Items.Add(item1);
+            listView1.Items.Add(item2);
+            //listView1.Items.Add(item3);
 
             AttributesRead = true;
         }

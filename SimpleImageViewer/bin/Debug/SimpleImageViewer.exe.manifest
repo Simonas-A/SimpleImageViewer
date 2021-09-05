@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SimpleImageViewer.exe" size="293360">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SimpleImageViewer.exe" size="292848">
       <assemblyIdentity name="SimpleImageViewer" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>f/DYy/1RTzuYCztrzYmH8+D3mFofh4FtRhshiWQD4iU=</dsig:DigestValue>
+        <dsig:DigestValue>GCjkNQT9jqFQRJk82pXx9XMnQTB0E3eJZIHTWqv8w4k=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
