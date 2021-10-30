@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -847,6 +848,10 @@ namespace SimpleImageViewer
             {
                 ImagePrevious();
             }
+            else if (Math.Abs(X - resolution.Width / 2) <= 2 * reactionSize && Y <= reactionSize) // middle top
+            {
+
+            }
         }
 
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
@@ -891,6 +896,10 @@ namespace SimpleImageViewer
             {
                 ImagePrevious();
             }
+            else if (Math.Abs(X - resolution.Width / 2) <= 2 * reactionSize && Y <= reactionSize) // middle top
+            {
+                //MessageBox.Show("");
+            }
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -923,6 +932,12 @@ namespace SimpleImageViewer
         private void listView1_DrawItem(object sender, DrawListViewItemEventArgs e)
         {
             e.DrawDefault = true;
+        }
+
+        private void label2_DoubleClick(object sender, EventArgs e)
+        {
+            // this.WindowState = FormWindowState.Minimized;
+            Process.Start("explorer.exe", @"/select," + path);
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)

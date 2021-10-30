@@ -87,6 +87,7 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "label2";
             this.label2.Visible = false;
+            this.label2.DoubleClick += new System.EventHandler(this.label2_DoubleClick);
             // 
             // listView1
             // 
