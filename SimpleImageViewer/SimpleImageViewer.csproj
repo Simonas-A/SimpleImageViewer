@@ -49,10 +49,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6C4B2C6E27676698067C521AEEA9F4D065558285</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>728592B0E57C84C172B88743BD22417CB779D2D6</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>SimpleImageViewer_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>SimpleImageViewer_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -144,6 +144,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="SimpleImageViewer_1_TemporaryKey.pfx" />
     <None Include="SimpleImageViewer_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

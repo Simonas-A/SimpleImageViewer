@@ -471,6 +471,10 @@ namespace SimpleImageViewer
             {
                 //ImageRandomPrevious();
             }
+            else if (e.KeyCode == Keys.Back)
+            {
+                Close();
+            }
         }
 
         private void ImageRandomPrevious()
