@@ -43,6 +43,18 @@
     </dependentAssembly>
   </dependency>
   <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MetadataExtractor.dll" size="724480">
+      <assemblyIdentity name="MetadataExtractor" version="2.7.2.0" publicKeyToken="B66B5CCAF776C301" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>UKekNfRalH4ltvX/VnmQWNP53UnLBr28wLS/NPrFzD0=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Microsoft.Win32.Registry.dll" size="31376">
       <assemblyIdentity name="Microsoft.Win32.Registry" version="4.1.1.0" publicKeyToken="B03F5F7F11D50A3A" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -55,14 +67,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SimpleImageViewer.exe" size="293360">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SimpleImageViewer.exe" size="294896">
       <assemblyIdentity name="SimpleImageViewer" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>fnk12vphj8ogV4k2OPLgSvDFoCf2EUVMzeKySGQpYac=</dsig:DigestValue>
+        <dsig:DigestValue>C6/laCzQKSiTaJE+RJtw92IX17zz479B0lc3oO6y/Ec=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -147,6 +159,18 @@
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
         <dsig:DigestValue>qICZWPIdHDDJW80z0K0cwlcbndifRVp6K+80HtaiArc=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XmpCore.dll" size="144384">
+      <assemblyIdentity name="XmpCore" version="6.1.10.1" publicKeyToken="961F4F366277B80E" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>ry/xKgM9swtg+OEZ87zgt3phRdUnOcVKry4AiBIOYzs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

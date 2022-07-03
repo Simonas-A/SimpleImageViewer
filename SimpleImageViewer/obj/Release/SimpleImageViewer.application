@@ -7,14 +7,14 @@
     <framework targetVersion="4.7.2" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="SimpleImageViewer.exe.manifest" size="9827">
+    <dependentAssembly dependencyType="install" codebase="SimpleImageViewer.exe.manifest" size="11182">
       <assemblyIdentity name="SimpleImageViewer.exe" version="1.0.0.5" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>CtBtejujHXWl/2r9qoKoBTzW4tPGOtSLvbQRp7CudqI=</dsig:DigestValue>
+        <dsig:DigestValue>VFJRdGoWAGV4Wlw0EsfEb7ycuAJi+z9I2LahmZeIMCc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

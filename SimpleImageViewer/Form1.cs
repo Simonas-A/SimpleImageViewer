@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +18,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.FileIO;
 
 namespace SimpleImageViewer
 {
@@ -103,7 +108,7 @@ namespace SimpleImageViewer
             label1.Visible = false;
             //label2.Text = "";
 
-
+            listView1.Height = 180;
             listView1.Left = (resolution.Width - listView1.Width) / 2;
             listView1.Top = (resolution.Height - listView1.Height);
 
@@ -232,7 +237,7 @@ namespace SimpleImageViewer
                 images.Add(path);
                 index++;
                 
-                files = Directory.GetFiles(root, "*.*").Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
+                files = System.IO.Directory.GetFiles(root, "*.*").Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
             }
         }
 
@@ -459,7 +464,7 @@ namespace SimpleImageViewer
 
                 //files = new DirectoryInfo(Path.GetDirectoryName(path)).GetFiles("*", SearchOption.AllDirectories).Where(x => (x.Attributes & FileAttributes.Hidden) == 0).Where(s => supportedExtensions.Contains(Path.GetExtension(s.FullName).ToLower())).Select(a => a.FullName).ToArray();
                 //files = Directory.GetFiles(Path.GetDirectoryName(path), "*", SearchOption.TopDirectoryOnly);
-                files = Directory.GetFiles(Path.GetDirectoryName(path), "*", SearchOption.AllDirectories).Where(s => ( ( (new FileInfo(s)).Attributes != FileAttributes.Hidden)) && (!s.Contains("$RECYCLE")) && supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
+                files = System.IO.Directory.GetFiles(Path.GetDirectoryName(path), "*", System.IO.SearchOption.AllDirectories).Where(s => ( ( (new FileInfo(s)).Attributes != FileAttributes.Hidden)) && (!s.Contains("$RECYCLE")) && supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToArray();
                 subDirectoriesScanned = true;
 
                 label1.Text = "Files: " + files.Length.ToString();
@@ -475,6 +480,30 @@ namespace SimpleImageViewer
             {
                 Close();
             }
+            else if (e.KeyCode == Keys.Delete)
+            {
+
+                Delete();
+            }
+        }
+
+        private void Delete()
+        {
+            string prevPath = path;
+
+            if (! (ImageNext() >= 0 || ImagePrevious() >= 0))
+            {
+                baseImage.Dispose();
+                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(prevPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                Close();
+            }
+            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(prevPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+            int id = Array.IndexOf(files, prevPath);
+
+            List<string> filesT = files.ToList();
+            filesT.RemoveAt(id);
+            files = filesT.ToArray();
         }
 
         private void ImageRandomPrevious()
@@ -490,7 +519,7 @@ namespace SimpleImageViewer
             }
         }
 
-        private void ImageNext()
+        private int ImageNext()
         {
             int id = Array.IndexOf(files, path);
 
@@ -500,18 +529,21 @@ namespace SimpleImageViewer
                 {
 
                 }
-
+                baseImage.Dispose();
                 baseImage = Image.FromFile(files[id + 1]);
 
                 path = files[id + 1];
                 images.Add(path);
                 index++;
                 SetFullImage(baseImage);
+
+                return id + 1;
             }
 
+            return -1;
         }
 
-        private void ImagePrevious()
+        private int ImagePrevious()
         {
             int id = Array.IndexOf(files, path);
 
@@ -526,7 +558,11 @@ namespace SimpleImageViewer
                     index--;
                 }
                 SetFullImage(baseImage);
+
+                return id - 1;
             }
+
+            return -1;
         }
 
         private void ImageRandom()
@@ -731,7 +767,9 @@ namespace SimpleImageViewer
 
                     if (!AttributesRead)
                     {
-                        FillListView();
+                        List<Tuple<string, string>> attributes = GetAttributes();
+
+                        FillListView(attributes);
                     }
 
                     return;
@@ -747,37 +785,64 @@ namespace SimpleImageViewer
             
         }
 
-        private void FillListView()
+        private List<Tuple<string, string>> GetAttributes()
         {
-            listView1.Items.Clear();
+            List<Tuple<string, string>> attributes = new List<Tuple<string, string>>();
 
-            ListViewItem item0 = new ListViewItem("Width");
-            item0.SubItems.Add(baseWidth.ToString());
-            item0.BackColor = Color.FromArgb(33, 33, 33);
-            item0.ForeColor = Color.Lime;
+            
 
-            ListViewItem item1 = new ListViewItem("Height");
-            item1.SubItems.Add(baseHeight.ToString());
-            item1.BackColor = Color.FromArgb(33, 33, 33);
-            item1.ForeColor = Color.Lime;
+            var directories = ImageMetadataReader.ReadMetadata(path);
+            var subIfdDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
 
-            ListViewItem item2 = new ListViewItem("Date created");
-            item2.SubItems.Add(File.GetCreationTime(path).ToString());
-            item2.BackColor = Color.FromArgb(33, 33, 33);
-            item2.ForeColor = Color.Lime;
+            var model = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagModel);
+            var iso = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagIsoEquivalent);
+            var f = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagFNumber);
+            var expousure = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagExposureTime);
+            var focalLength = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagFocalLength);
+            var flash = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagFlash);
+
+
+
+            attributes.Add(new Tuple<string, string>("Width", baseWidth.ToString()));
+            attributes.Add(new Tuple<string, string>("Height", baseHeight.ToString()));
+            attributes.Add(new Tuple<string, string>("Date created", File.GetCreationTime(path).ToString()));
+            attributes.Add(new Tuple<string, string>("Date modified", File.GetLastWriteTime(path).ToString()));
+            //attributes.Add(new Tuple<string, string>("Model", model));
+            attributes.Add(new Tuple<string, string>("Iso", iso));
+            attributes.Add(new Tuple<string, string>("F-stop", f));
+            attributes.Add(new Tuple<string, string>("Expousure", expousure));
+            //attributes.Add(new Tuple<string, string>("Focal length", focalLength));
+            attributes.Add(new Tuple<string, string>("Flash", flash));
 
             /*
-            ListViewItem item3 = new ListViewItem("Date modified");
-            item3.SubItems.Add(File.GetLastWriteTime(path).ToString());
-            item3.BackColor = Color.FromArgb(33, 33, 33);
-            item3.ForeColor = Color.Lime;
+            FileInfo fi = new FileInfo(path);
+
+            using (FileStream fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                BitmapSource img = BitmapFrame.Create(fs);
+                BitmapMetadata md = (BitmapMetadata)img.Metadata;
+                string date = md.DateTaken;
+                md.
+            }
             */
 
 
-            listView1.Items.Add(item0);
-            listView1.Items.Add(item1);
-            listView1.Items.Add(item2);
-            //listView1.Items.Add(item3);
+            return attributes;
+        }
+
+        private void FillListView(List<Tuple<string, string>> attributes)
+        {
+            listView1.Items.Clear();
+
+            foreach (var attribute in attributes)
+            {
+                ListViewItem item = new ListViewItem(attribute.Item1);
+                item.SubItems.Add(attribute.Item2);
+                item.BackColor = Color.FromArgb(33, 33, 33);
+                item.ForeColor = Color.Lime;
+                listView1.Items.Add(item);
+            }
+
 
             AttributesRead = true;
         }

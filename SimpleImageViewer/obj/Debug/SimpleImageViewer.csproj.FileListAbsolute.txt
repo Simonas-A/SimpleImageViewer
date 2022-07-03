@@ -22,3 +22,8 @@ C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\Simp
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.exe
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.pdb
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csproj.AssemblyReference.cache
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Debug\SimpleImageViewer.csproj.SuggestedBindingRedirects.cache
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\XmpCore.dll
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\XmpCore.xml
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\MetadataExtractor.dll
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Debug\MetadataExtractor.xml

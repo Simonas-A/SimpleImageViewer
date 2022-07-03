@@ -3,7 +3,6 @@ C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\Si
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\SimpleImageViewer.application
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\SimpleImageViewer.exe
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\SimpleImageViewer.pdb
-C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.csprojAssemblyReference.cache
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.Form1.resources
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.Properties.Resources.resources
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.csproj.GenerateResource.cache
@@ -22,3 +21,9 @@ C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\Sy
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\TopShelf.ServiceInstaller.dll
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\System.ValueTuple.xml
 C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.csproj.CopyComplete
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\MetadataExtractor.dll
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\XmpCore.dll
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\MetadataExtractor.xml
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\bin\Release\XmpCore.xml
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.csproj.AssemblyReference.cache
+C:\Users\Simuxxl\source\repos\SimpleImageViewer\SimpleImageViewer\obj\Release\SimpleImageViewer.csproj.SuggestedBindingRedirects.cache
