@@ -101,6 +101,12 @@ namespace SimpleImageViewer
             pictureBox2.Image = Properties.Resources.left;
 
             monitor = SimpleImageViewer.Properties.Settings.Default.Monitor;
+            if (Screen.AllScreens.Length - 1 < monitor)
+            {
+                monitor = 0;
+                SimpleImageViewer.Properties.Settings.Default.Monitor = monitor;
+                Properties.Settings.Default.Save();
+            }
 
             resolution = Screen.AllScreens[monitor].Bounds;
 
@@ -490,14 +496,28 @@ namespace SimpleImageViewer
         private void Delete()
         {
             string prevPath = path;
+            bool closeAfter = false;
 
             if (! (ImageNext() >= 0 || ImagePrevious() >= 0))
             {
                 baseImage.Dispose();
-                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(prevPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                Close();
+                pictureBox1.Image.Dispose();
+                closeAfter = true;   
             }
-            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(prevPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+            try
+            {
+                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(prevPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            //MessageBox.Show("opa");
+
+            if (closeAfter)
+                Close();
 
             int id = Array.IndexOf(files, prevPath);
 
@@ -1035,6 +1055,7 @@ namespace SimpleImageViewer
             DateTime dt1 = DateTime.Now;
 
             loadImage = Manipulator.ZoomImage(img, oldDisplayedRectangle, resolution, level);
+            //img.Dispose();
 
             //Console.WriteLine("End: " + level);
 
