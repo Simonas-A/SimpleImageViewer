@@ -108,7 +108,7 @@ namespace SimpleImageViewer
             label1.Visible = false;
             //label2.Text = "";
 
-            listView1.Height = 180;
+            listView1.Height = resolution.Height / 5;
             listView1.Left = (resolution.Width - listView1.Width) / 2;
             listView1.Top = (resolution.Height - listView1.Height);
 
